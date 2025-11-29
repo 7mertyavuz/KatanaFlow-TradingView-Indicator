@@ -4,9 +4,8 @@
 ![Platform](https://img.shields.io/badge/Platform-TradingView-black)
 ![Type](https://img.shields.io/badge/Category-Algorithmic%20Trading-success)
 
-
-<img width="2028" height="1181" alt="image" src="https://github.com/user-attachments/assets/7e13b0a7-40d1-4e7d-ac4d-88c55696aa58" />
-<img width="2028" height="1181" alt="image" src="https://github.com/user-attachments/assets/c8e36232-8e4b-4fdd-b336-379630f9654f" />
+<img width="2030" height="1180" alt="image" src="https://github.com/user-attachments/assets/7279da93-3479-4793-8cfb-b3f8d78cab0c" />
+<img width="2037" height="1176" alt="image" src="https://github.com/user-attachments/assets/3053b322-18f4-4ab2-a560-ab9cd37bb1bd" />
 
 > *Figure 1: KatanaFlow executing a trend reversal signal in Expert Mode.*
 
