@@ -1,0 +1,104 @@
+// KatanaFlow v1.0.1
+// Geliştirici: Mert Yavuz
+// Güncelleme: 2025-08-08 19:23:58
+//@version=6
+indicator("KatanaFlow", overlay=true)
+
+// === Kullanıcı Modu Ayarı ===
+mod = input.string("Temel", title="Kullanıcı Modu", options=["Temel", "Uzman"])
+
+// === TRF (Twin Range Filter) ===
+source = input.source(close, title="Veri Kaynağı (TRF)")
+per1 = input.int(12, minval=1, title="Hızlı Periyot")
+mult1 = input.float(1.0, minval=0.1, title="Hızlı Aralık Katsayısı")
+per2 = input.int(4, minval=1, title="Yavaş Periyot")
+mult2 = input.float(2.0, minval=0.1, title="Yavaş Aralık Katsayısı")
+
+smoothrng(x, t, m) =>
+    wper = t * 2 - 1
+    avrng = ta.ema(math.abs(x - x[1]), t)
+    ta.ema(avrng, wper) * m
+
+smrng1 = smoothrng(source, per1, mult1)
+smrng2 = smoothrng(source, per2, mult2)
+smrng = (smrng1 + smrng2) / 2
+
+var float filt = source
+filt := source > filt[1] ? (source - smrng < filt[1] ? filt[1] : source - smrng) : (source + smrng > filt[1] ? filt[1] : source + smrng)
+
+var float upward = 0.0
+var float downward = 0.0
+upward := filt > filt[1] ? nz(upward[1]) + 1 : filt < filt[1] ? 0 : nz(upward[1])
+downward := filt < filt[1] ? nz(downward[1]) + 1 : filt > filt[1] ? 0 : nz(downward[1])
+
+hband = filt + smrng
+lband = filt - smrng
+
+longCond = (source > filt and upward > 0)
+shortCond = (source < filt and downward > 0)
+
+var int CondIni = 0
+CondIni := longCond ? 1 : shortCond ? -1 : CondIni[1]
+
+long = longCond and CondIni[1] == -1
+short = shortCond and CondIni[1] == 1
+
+plotshape(long, title="KATA Long", text="KATA Long", style=shape.labelup, textcolor=color.black, size=size.tiny, location=location.belowbar, color=color.lime)
+plotshape(short, title="KATA Short", text="KATA Short", style=shape.labeldown, textcolor=color.white, size=size.tiny, location=location.abovebar, color=color.red)
+
+alertcondition(long, title="KATA Long", message="📈 KATA Long sinyali")
+alertcondition(short, title="KATA Short", message="📉 KATA Short sinyali")
+
+plot(mod == "Uzman" ? filt : na, title="TRF Filtresi", color=color.gray)
+plot(mod == "Uzman" ? hband : na, title="TRF Üst Bant", color=color.red)
+plot(mod == "Uzman" ? lband : na, title="TRF Alt Bant", color=color.green)
+
+// === REMA (KATA Trend) ===
+price = input.source(close, 'Veri Kaynağı (KATA)', group='KATA Trend Ayarları')
+length = input.int(45, minval=1, group='KATA Trend Ayarları')
+smooth = input.int(1, minval=1, group='KATA Trend Ayarları')
+mult = input.float(0.3, minval=0.05, maxval=3, step=0.05, title='Genişlik', inline='SD Kanal', group='KATA Trend Ayarları')
+sd_len = input.int(5, minval=1, title='Periyot', inline='SD Kanal', group='KATA Trend Ayarları')
+
+baseline = ta.wma(price, sd_len)
+dev = mult * ta.stdev(price, sd_len)
+upper = baseline + dev
+lower = baseline - dev
+cprice = price > upper ? upper : price < lower ? lower : price
+REMA = ta.wma(ta.wma(cprice, length), smooth)
+REMA_up = REMA > REMA[1]
+plot(REMA, title='KATA Trend Çizgisi', color=REMA_up ? color.green : color.red, linewidth=3)
+
+SwingDn = REMA_up[1] and not REMA_up
+SwingUp = REMA_up and not REMA_up[1]
+alertcondition(SwingUp, title="KATA Swing Up", message="📊 KatanaFlow trend yukarı döndü")
+alertcondition(SwingDn, title="KATA Swing Down", message="📊 KatanaFlow trend aşağı döndü")
+alertcondition(SwingUp or SwingDn, title="KATA Trend Değişimi", message="📊 KatanaFlow trend yön değiştirdi.")
+
+// === Opsiyonel MA'lar (Uzman modda açılır) ===
+f_ma(source, length, mtype) =>
+    switch mtype
+        'SMA' => ta.sma(source, length)
+        'EMA' => ta.ema(source, length)
+        => ta.wma(source, length)
+
+gr_ma = 'Opsiyonel MA\'lar'
+t_ma1 = 'MA #1'
+t_ma2 = 'MA #2'
+
+show_ma1 = input.bool(false, t_ma1, inline=t_ma1, group=gr_ma)
+ma1_type = input.string('SMA', '', options=['SMA', 'EMA', 'WMA'], inline=t_ma1, group=gr_ma)
+ma1_source = input.source(close, '', inline=t_ma1, group=gr_ma)
+ma1_length = input.int(50, '', minval=1, inline=t_ma1, group=gr_ma)
+ma1_color = #9c27b0
+ma1 = f_ma(ma1_source, ma1_length, ma1_type)
+plot(mod == "Uzman" and show_ma1 ? ma1 : na, color=color.new(ma1_color, 0), title=t_ma1, linewidth=1)
+
+show_ma2 = input.bool(false, t_ma2, inline=t_ma2, group=gr_ma)
+ma2_type = input.string('SMA', '', options=['SMA', 'EMA', 'WMA'], inline=t_ma2, group=gr_ma)
+ma2_source = input.source(close, '', inline=t_ma2, group=gr_ma)
+ma2_length = input.int(100, '', minval=1, inline=t_ma2, group=gr_ma)
+ma2_color = #1163f6
+ma2 = f_ma(ma2_source, ma2_length, ma2_type)
+plot(mod == "Uzman" and show_ma2 ? ma2 : na, color=color.new(ma2_color, 0), title=t_ma2, linewidth=1)
+
