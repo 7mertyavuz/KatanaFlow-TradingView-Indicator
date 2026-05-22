@@ -9,75 +9,43 @@
 
 > *Figure 1: KatanaFlow executing a trend reversal signal in Expert Mode.*
 
-## 📖 Executive Summary
-**KatanaFlow** is a proprietary technical analysis algorithm developed for **TradingView**, designed to address the common latency and false signal issues inherent in standard trend-following indicators.
+# 📈 KatanaFlow - TradingView İndikatörü
 
-Unlike traditional Moving Average crossovers, KatanaFlow implements a **Twin Range Filter (TRF)** architecture. This approach mathematically smooths market volatility to isolate the underlying trend, providing high-probability entry and exit points for both intraday scalping and swing trading strategies.
+Teknik analiz çalışırken klasik hareketli ortalamaların (Moving Average) gecikmeli ve hatalı sinyallerinden sıkıldığım için Pine Script ile geliştirdiğim bir TradingView indikatörüdür. 
 
-## 🚀 Technical Features
+Temelde "Twin Range Filter" (TRF) matematiğini kullanarak piyasadaki gereksiz gürültüyü (küçük fiyat dalgalanmalarını) filtrelemeyi ve daha temiz trend dönüş sinyalleri yakalamayı amaçlar.
 
-### 1. Advanced Noise Filtration (TRF)
-The core engine utilizes a double-smoothed volatility filter. By calculating the deviation of price from its mean using varied periods, the algorithm effectively distinguishes between market "noise" (insignificant fluctuations) and genuine trend reversals.
+## ✨ Öne Çıkan Özellikler
 
-### 2. Signal Integrity (Non-Repainting)
-Designed with strict algorithmic reliability in mind:
-* **Confirmation:** All signals (`KATA Long` / `KATA Short`) are confirmed strictly at the **bar close**.
-* **Permanence:** Once a signal is printed on the chart, it is permanent. It does not repaint, shift, or vanish, ensuring validity for backtesting and historical analysis.
+* **Repaint Yapmaz:** Bir indikatörde en sinir bozucu şey sinyalin sonradan kaybolmasıdır. KatanaFlow'da mum (bar) kapandığında ekrana basılan KATA Long / Short sinyalleri kalıcıdır. Bu sayede geçmişe dönük (backtest) analizleri güvenle yapılabilir.
+* **Twin Range Filter (TRF):** Çift yumuşatılmış dalgalanma filtresi kullanır. Fiyatın ortalamadan sapmasını hesaplayarak sahte kırılımları eler.
+* **İkili Görünüm Modu:**
+  * *Temel Mod:* Grafiği kalabalıklaştırmamak için sadece al/sat sinyallerini gösterir.
+  * *Uzman Mod:* Arka planda çalışan dinamik destek/direnç bantlarını ve trend çizgilerini de ekrana yansıtır.
+* **Bot Otomasyonu:** Algoritmik trade ile uğraşanlar için `alertcondition()` fonksiyonları eklidir; 3Commas veya kendi yazdığınız Python botlarına webhook ile alarm gönderebilirsiniz.
 
-### 3. Modular Interface
-The system offers two distinct visualization modes to suit different analytical needs:
-* **Basic Mode:** A minimalist interface displaying only entry/exit signals, ideal for decluttered price action analysis.
-* **Expert Mode:** Activates the full analytical suite, including TRF Bands (Dynamic Support/Resistance), Trendlines, and auxiliary Moving Averages for confluence verification.
+## 🛠️ Nasıl Kullanılır?
 
-### 4. Algorithmic Automation
-The script is optimized for automated trading environments, featuring built-in `alertcondition()` functions compatible with third-party webhook services (e.g., 3Commas, Cryptohopper, or custom Python bots).
+1. Bu repodaki `KatanaFlow.pine` dosyasının içindeki kodun tamamını kopyalayın.
+2. TradingView'ı açın ve alt kısımdaki **Pine Editör** sekmesine gelin.
+3. Kodu yapıştırın ve **"Grafiğe Ekle"** (Add to Chart) butonuna basın.
+
+## 🎛️ Ayarlar Ne İşe Yarar?
+
+İndikatörün ayarlar penceresinden kendi stratejinize göre şu değişiklikleri yapabilirsiniz:
+- **Fast Period (Hızlı Periyot):** Kısa vadeli dalgalanma hassasiyetini ayarlar. Sayıyı küçültürseniz daha çok (ama daha riskli) sinyal alırsınız.
+- **Slow Period (Yavaş Periyot):** Uzun vadeli ana trendin temelini belirler.
+- **Multiplier (Çarpan):** Hatalı sinyalleri (Fakeout) engellemek için filtre bandının genişliğini ayarlar.
 
 ---
+*Not: Bu proje tamamen kişisel gelişim ve eğitim amacıyla yazılmıştır. Finansal piyasalar risk içerir, buradaki sinyaller yatırım tavsiyesi (YTD) değildir.*
 
-## 📺 System Demonstration
-
-View the algorithm's performance in live market conditions:
+**Geliştiren:** Hasan Mert Yavuz - *Bilgisayar Mühendisliği Öğrencisi*
 
 [![KatanaFlow Analysis](https://img.youtube.com/vi/z4b2ntVZgUw/0.jpg)](https://www.youtube.com/watch?v=z4b2ntVZgUw)
 
 > *Note: The video walkthrough provides a comprehensive overview of the signal logic.*
 
----
-
-## ⚙️ Methodology & Logic
-
-KatanaFlow determines trend directionality by comparing the current asset price against a dynamic volatility range. The mathematical smoothing logic is derived as follows:
-```pine
-// Volatility Smoothing Calculation
-weighted_period = period * 2 - 1
-average_range = ema(abs(x - x[1]), period)
-smoothed_range = ema(average_range, weighted_period) * multiplier
-
-The algorithm synthesizes two distinct timeframes (Fast & Slow) to establish a "Fair Value" equilibrium line.
-
-Bullish Regime: Price sustains above the filter threshold.
-
-Bearish Regime: Price sustains below the filter threshold.
-
-🛠️ Deployment Instructions
-Navigate to the KatanaFlow.pine file within this repository.
-
-Copy the source code.
-
-Launch TradingView and open the Pine Editor.
-
-Paste the source code and select "Add to Chart".
-
-🎛️ Configuration Parameters
-Parameter	Default	Function
-User Mode	Temel	Toggles between Basic (Signal only) and Expert (Full Suite) visualization.
-Fast Period	12	Adjusts sensitivity for short-term volatility. Lower values increase signal frequency.
-Slow Period	4	Adjusts sensitivity for the longer-term trend baseline.
-Multiplier	1.0 / 2.0	Standard deviation multiplier for band expansion. Higher values reduce false positives.
-
-E-Tablolar'a aktar
-
-⚖️ Disclaimer
-This software is for educational and analytical purposes only. Financial trading involves significant risk. Past performance of any trading system is not indicative of future results. Users should employ proper risk management strategies.
+cational and analytical purposes only. Financial trading involves significant risk. Past performance of any trading system is not indicative of future results. Users should employ proper risk management strategies.
 
 Developed by Hasan Mert Yavuz Computer Engineering Student & Algorithm Developer
