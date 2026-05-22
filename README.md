@@ -45,7 +45,3 @@ Temelde "Twin Range Filter" (TRF) matematiğini kullanarak piyasadaki gereksiz g
 [![KatanaFlow Analysis](https://img.youtube.com/vi/z4b2ntVZgUw/0.jpg)](https://www.youtube.com/watch?v=z4b2ntVZgUw)
 
 > *Note: The video walkthrough provides a comprehensive overview of the signal logic.*
-
-cational and analytical purposes only. Financial trading involves significant risk. Past performance of any trading system is not indicative of future results. Users should employ proper risk management strategies.
-
-Developed by Hasan Mert Yavuz Computer Engineering Student & Algorithm Developer
